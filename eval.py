@@ -58,6 +58,15 @@ class DataFrameAusgabe:
 		):
 			print(self.dataframe)
 
+	def speichern_als_csv(self) -> Path:
+		workspace = Path(__file__).resolve().parent
+		results_dir = workspace / "Results"
+		results_dir.mkdir(exist_ok=True)
+		timestamp = time.strftime("%Y%m%d_%H%M%S")
+		output_path = results_dir / f"{timestamp}_results.csv"
+		self.dataframe.to_csv(output_path, index=False)
+		return output_path
+
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
@@ -79,3 +88,5 @@ if __name__ == "__main__":
 	ausgabe = DataFrameAusgabe(dataframe, client)
 	ausgabe.bewerten()
 	ausgabe.ausgeben()
+	output_path = ausgabe.speichern_als_csv()
+	print(f"\nErgebnis als CSV gespeichert unter: {output_path}")
