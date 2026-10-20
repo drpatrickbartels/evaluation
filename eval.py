@@ -1,12 +1,42 @@
 import argparse
+import os
 from pathlib import Path
 
 import pandas as pd
+from openai import OpenAI
+
+
+MODEL = "GLM-5.3-Flash-NVFP4"
+BASE_URL = "https://llm.lab.f4-w.de/v1"
 
 
 class DataFrameAusgabe:
-	def __init__(self, dataframe: pd.DataFrame) -> None:
+	def __init__(self, dataframe: pd.DataFrame, client: OpenAI) -> None:
 		self.dataframe = dataframe
+		self.client = client
+
+	def bewerten(self) -> None:
+		benoetigte_spalten = {"frage", "sollantwort"}
+		fehlende_spalten = benoetigte_spalten.difference(self.dataframe.columns)
+		if fehlende_spalten:
+			raise ValueError(
+				f"Im DataFrame fehlen erforderliche Spalten: {', '.join(sorted(fehlende_spalten))}"
+			)
+
+		istantworten = []
+		pruefungen = []
+		for _, zeile in self.dataframe.iterrows():
+			antwort = self.client.chat.completions.create(
+				model=MODEL,
+				messages=[{"role": "user", "content": str(zeile["frage"])}],
+			)
+			istantwort = (antwort.choices[0].message.content or "").strip()
+			sollantwort = str(zeile["sollantwort"]).strip()
+			istantworten.append(istantwort)
+			pruefungen.append(istantwort.casefold() == sollantwort.casefold())
+
+		self.dataframe["istantwort"] = istantworten
+		self.dataframe["prüfung"] = pruefungen
 
 	def ausgeben(self) -> None:
 		print(self.dataframe)
@@ -22,4 +52,11 @@ if __name__ == "__main__":
 	)
 	argumente = parser.parse_args()
 	dataframe = pd.read_csv(argumente.csv_datei)
-	DataFrameAusgabe(dataframe).ausgeben()
+	api_schluessel = os.environ.get("OPENAI_API_KEY")
+	if not api_schluessel:
+		parser.error("Bitte den API-Schlüssel in der Umgebungsvariable OPENAI_API_KEY setzen.")
+
+	client = OpenAI(base_url=BASE_URL, api_key=api_schluessel)
+	ausgabe = DataFrameAusgabe(dataframe, client)
+	ausgabe.bewerten()
+	ausgabe.ausgeben()
