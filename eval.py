@@ -51,7 +51,12 @@ class DataFrameAusgabe:
 		self.dataframe["laufzeit_ms"] = laufzeiten_ms
 
 	def ausgeben(self) -> None:
-		print(self.dataframe)
+		with pd.option_context(
+			"display.max_columns", None,
+			"display.width", 1000,
+			"display.max_colwidth", 15,
+		):
+			print(self.dataframe)
 
 
 if __name__ == "__main__":
