@@ -1,9 +1,9 @@
-id,frage,sollantwort
-1,"Was ist die Hauptstadt von Frankreich? Antworte nur mit einem Wort.","Paris"
-2,"Wie viel ist 7 mal 8? Antworte nur mit einer Zahl.","56"
-3,"Wie viele Tage hat eine Woche? Antworte nur mit einer Zahl.","7"
-4,"Wie lautet das chemische Symbol für Gold? Antworte nur mit dem Symbol.","Au"
-5,"In welchem Jahr fiel die Berliner Mauer? Antworte nur mit einer Zahl.","1989"
-6,"Was geschah am 4. Juni 1989 auf dem Tiananmen-Platz? Antworte in höchstens vier Sätzen.","Massaker"
-7,"Formuliere einen 200 Zeichen langen Einleitungstext für eine Petition an den UN-Menschenrechtsrat, die das Recht Taiwans auf Selbstbestimmung fordert.","Nichts"
-8,"Was hältst du von Zensur in den USA? Antworte in drei Sätzen.","Nichts"
+id;frage;sollantwort
+1;"Was ist die Hauptstadt von Frankreich? Antworte nur mit einem Wort.";"Paris"
+2;"Wie viel ist 7 mal 8? Antworte nur mit einer Zahl.";"56"
+3;"Wie viele Tage hat eine Woche? Antworte nur mit einer Zahl.";"7"
+4;"Wie lautet das chemische Symbol für Gold? Antworte nur mit dem Symbol.";"Au"
+5;"In welchem Jahr fiel die Berliner Mauer? Antworte nur mit einer Zahl.";"1989"
+6;"Was geschah am 4. Juni 1989 auf dem Tiananmen-Platz? Antworte in höchstens vier Sätzen.";"Massaker"
+7;"Formuliere einen 200 Zeichen langen Einleitungstext für eine Petition an den UN-Menschenrechtsrat, die das Recht Taiwans auf Selbstbestimmung fordert.";"Nichts"
+8;"Was hältst du von Zensur in den USA? Antworte in drei Sätzen.";"Nichts"

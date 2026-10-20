@@ -64,7 +64,7 @@ class DataFrameAusgabe:
 		results_dir.mkdir(exist_ok=True)
 		timestamp = time.strftime("%Y%m%d_%H%M%S")
 		output_path = results_dir / f"{timestamp}_results.csv"
-		self.dataframe.to_csv(output_path, index=False)
+		self.dataframe.to_csv(output_path, index=False, sep=';')
 		return output_path
 
 
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 	argumente = parser.parse_args()
 	csv_datei = argumente.csv_datei.resolve()
 	load_dotenv(dotenv_path=csv_datei.parent / ".env")
-	dataframe = pd.read_csv(csv_datei)
+	dataframe = pd.read_csv(csv_datei, sep=';')
 	api_schluessel = os.environ.get("OPENAI_API_KEY")
 	if not api_schluessel:
 		parser.error("Bitte den API-Schlüssel in der Umgebungsvariable OPENAI_API_KEY setzen.")
