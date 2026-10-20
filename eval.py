@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 import pandas as pd
+from dotenv import load_dotenv
 from openai import OpenAI
 
 
@@ -51,7 +52,9 @@ if __name__ == "__main__":
 		default=Path(__file__).with_name("testdaten.csv"),
 	)
 	argumente = parser.parse_args()
-	dataframe = pd.read_csv(argumente.csv_datei)
+	csv_datei = argumente.csv_datei.resolve()
+	load_dotenv(dotenv_path=csv_datei.parent / ".env")
+	dataframe = pd.read_csv(csv_datei)
 	api_schluessel = os.environ.get("OPENAI_API_KEY")
 	if not api_schluessel:
 		parser.error("Bitte den API-Schlüssel in der Umgebungsvariable OPENAI_API_KEY setzen.")
