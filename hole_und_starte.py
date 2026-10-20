@@ -1,27 +1,34 @@
 import subprocess
 import sys
-import tempfile
+import time
 from pathlib import Path
 from urllib.error import URLError
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 
-SOURCE_URL = "https://raw.githubusercontent.com/drpatrickbartels/evaluation/main/hallo_welt.py"
-EXPECTED_SOURCE = b'print("Hallo Welt")\n'
+SOURCE_URL = "https://api.github.com/repos/drpatrickbartels/evaluation/contents/hallo_welt.py?ref=main"
 
 
 def main() -> int:
     try:
-        with urlopen(SOURCE_URL, timeout=15) as response:
-            source = response.read(len(EXPECTED_SOURCE) + 1)
+        request = Request(
+            f"{SOURCE_URL}&cache_bust={time.time_ns()}",
+            headers={
+                "Accept": "application/vnd.github.raw",
+                "Cache-Control": "no-cache, no-store",
+                "Pragma": "no-cache",
+                "User-Agent": "evaluation-fetcher",
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+        )
+        with urlopen(request, timeout=15) as response:
+            source = response.read()
 
-        if source != EXPECTED_SOURCE:
-            raise ValueError("Der Inhalt im Repository entspricht nicht dem erwarteten Programm.")
-
-        with tempfile.TemporaryDirectory() as temp_dir:
-            local_program = Path(temp_dir) / "hallo_welt.py"
+        local_program = Path(__file__).with_name("hallo_welt.py")
+        if not local_program.exists() or local_program.read_bytes() != source:
             local_program.write_bytes(source)
-            subprocess.run([sys.executable, str(local_program)], check=True)
+
+        subprocess.run([sys.executable, str(local_program)], check=True)
     except (OSError, URLError, ValueError, subprocess.CalledProcessError) as error:
         print(f"Fehler: {error}", file=sys.stderr)
         return 1
