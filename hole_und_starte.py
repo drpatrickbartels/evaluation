@@ -1,12 +1,14 @@
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
+from shutil import copyfile
 from urllib.error import URLError
 from urllib.request import Request, urlopen
 
 
-SOURCE_URL = "https://api.github.com/repos/drpatrickbartels/evaluation/contents/hallo_welt.py?ref=main"
+SOURCE_URL = "https://api.github.com/repos/drpatrickbartels/evaluation/contents/eval.py?ref=main"
 
 
 def main() -> int:
@@ -24,11 +26,22 @@ def main() -> int:
         with urlopen(request, timeout=15) as response:
             source = response.read()
 
-        local_program = Path(__file__).with_name("hallo_welt.py")
-        if not local_program.exists() or local_program.read_bytes() != source:
-            local_program.write_bytes(source)
+        workspace = Path(__file__).parent
+        local_program = workspace / "eval.py"
+        csv_file = workspace / "testdaten.csv"
 
-        subprocess.run([sys.executable, str(local_program)], check=True)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            if local_program.exists() and local_program.read_bytes() == source:
+                program_to_run = local_program
+            else:
+                program_to_run = Path(temp_dir) / "eval.py"
+                program_to_run.write_bytes(source)
+                copyfile(csv_file, Path(temp_dir) / "testdaten.csv")
+
+            subprocess.run(
+                [sys.executable, str(program_to_run), str(csv_file)],
+                check=True,
+            )
     except (OSError, URLError, ValueError, subprocess.CalledProcessError) as error:
         print(f"Fehler: {error}", file=sys.stderr)
         return 1

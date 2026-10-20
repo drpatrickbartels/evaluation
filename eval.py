@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 
 import pandas as pd
@@ -12,6 +13,13 @@ class DataFrameAusgabe:
 
 
 if __name__ == "__main__":
-	datei = Path(__file__).with_name("testdaten.csv")
-	dataframe = pd.read_csv(datei)
+	parser = argparse.ArgumentParser()
+	parser.add_argument(
+		"csv_datei",
+		type=Path,
+		nargs="?",
+		default=Path(__file__).with_name("testdaten.csv"),
+	)
+	argumente = parser.parse_args()
+	dataframe = pd.read_csv(argumente.csv_datei)
 	DataFrameAusgabe(dataframe).ausgeben()
