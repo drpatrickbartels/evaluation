@@ -1,5 +1,6 @@
 import argparse
 import os
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -26,18 +27,28 @@ class DataFrameAusgabe:
 
 		istantworten = []
 		pruefungen = []
+		token_verbraeuche = []
+		laufzeiten_ms = []
 		for _, zeile in self.dataframe.iterrows():
+			startzeit = time.perf_counter_ns()
 			antwort = self.client.chat.completions.create(
 				model=MODEL,
 				messages=[{"role": "user", "content": str(zeile["frage"])}],
 			)
+			laufzeit_ms = (time.perf_counter_ns() - startzeit) / 1_000_000
 			istantwort = (antwort.choices[0].message.content or "").strip()
 			sollantwort = str(zeile["sollantwort"]).strip()
 			istantworten.append(istantwort)
 			pruefungen.append(istantwort.casefold() == sollantwort.casefold())
+			token_verbraeuche.append(
+				antwort.usage.total_tokens if antwort.usage is not None else None
+			)
+			laufzeiten_ms.append(round(laufzeit_ms, 2))
 
 		self.dataframe["istantwort"] = istantworten
 		self.dataframe["prüfung"] = pruefungen
+		self.dataframe["token_verbrauch"] = token_verbraeuche
+		self.dataframe["laufzeit_ms"] = laufzeiten_ms
 
 	def ausgeben(self) -> None:
 		print(self.dataframe)
